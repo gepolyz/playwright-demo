@@ -444,3 +444,4 @@ C:\Users\gepol\CSharpProjects\PlaywrihtQAProject\PlaywrightDemo\obj\Debug\net8.0
 C:\Users\gepol\CSharpProjects\PlaywrihtQAProject\PlaywrightDemo\obj\Debug\net8.0\PlaywrightDemo.pdb
 C:\Users\gepol\CSharpProjects\PlaywrihtQAProject\PlaywrightDemo\obj\Debug\net8.0\PlaywrightDemo.genruntimeconfig.cache
 C:\Users\gepol\CSharpProjects\PlaywrihtQAProject\PlaywrightDemo\obj\Debug\net8.0\ref\PlaywrightDemo.dll
+c:\Users\gepol\CSharpProjects\PlaywrihtQAProject\PlaywrightDemo\obj\Debug\net8.0\PlaywrightDemo.sourcelink.json
