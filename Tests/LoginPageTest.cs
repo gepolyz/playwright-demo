@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Microsoft.Playwright.NUnit;
+using PlaywrightDemo.Pages;
 
 
 namespace PlaywrightDemo.Tests;
@@ -12,12 +13,10 @@ public class LoginPageTest : PageTest
     [Test]
     public async Task Login_ToSite_WithValidCredential()
     {
-        await Page.GotoAsync(TestsConstants.BaseUrl);
+        var loginPage = new LoginPage(Page);
+        await loginPage.NavigateAsync(TestsConstants.BaseUrl);
+        await loginPage.LoginAsync(TestsConstants.ValidUsername, TestsConstants.ValidPassword);
 
-        await Page.FillAsync("input[name='username']", TestsConstants.ValidUsername);
-        await Page.FillAsync("input[name='password']", TestsConstants.ValidPassword);
-
-        await Page.ClickAsync("button[type='submit']");
         //Expect the URL contain "dashboard" 
         await Expect(Page).ToHaveURLAsync(new Regex("dashboard"));
     }
@@ -25,12 +24,11 @@ public class LoginPageTest : PageTest
     [Test]
     public async Task Logout_FromDashBoard()
     {
-        await Page.GotoAsync(TestsConstants.BaseUrl);
-        await Page.FillAsync("input[name='username']", TestsConstants.ValidUsername);
-        await Page.FillAsync("input[name='password']", TestsConstants.ValidPassword);
-        await Page.ClickAsync("button[type='submit']");
-        await Page.ClickAsync(".oxd-topbar-header-userarea");
-        await Page.ClickAsync("a.oxd-userdropdown-link[href*='logout']");
+
+        var loginPage = new LoginPage(Page);
+        await loginPage.NavigateAsync(TestsConstants.BaseUrl);
+        await loginPage.LoginAsync(TestsConstants.ValidUsername, TestsConstants.ValidPassword);
+        await loginPage.LogoutAsync();
         //Expect the URL contain "login", means returns to login page
         await Expect(Page).ToHaveURLAsync(new Regex("login"));
     }
@@ -38,13 +36,11 @@ public class LoginPageTest : PageTest
     [Test]
     public async Task Login_WihtBlank_Credentials()
     {
-        await Page.GotoAsync(TestsConstants.BaseUrl);
-        await Page.FillAsync("input[name='username']", "");
-        await Page.FillAsync("input[name='password']", "");
-        await Page.ClickAsync("button[type='submit']");
+        var loginPage = new LoginPage(Page);
+        await loginPage.NavigateAsync(TestsConstants.BaseUrl);
+        await loginPage.LoginAsync("", "");
 
-        var alert = await Page.WaitForSelectorAsync(".oxd-input-field-error-message");
-        var message = await alert.InnerTextAsync();
+        var message = await loginPage.GetAlertMessageRequiredAssync();
         //Pops a "Required" message
         Assert.That(message, Does.Contain("Required"));
     }
@@ -54,13 +50,11 @@ public class LoginPageTest : PageTest
     [TestCase("Jane", "admin123")]
     public async Task Login_WithInvalidCredentials_ShouldFail(string username, string password)
     {
-        await Page.GotoAsync(TestsConstants.BaseUrl);
-        await Page.FillAsync("input[name='username']", username);
-        await Page.FillAsync("input[name='password']", password);
-        await Page.ClickAsync("button[type='submit']");
+        var loginPage = new LoginPage(Page);
+        await loginPage.NavigateAsync(TestsConstants.BaseUrl);
+        await loginPage.LoginAsync(username, password);
 
-        var alert = await Page.WaitForSelectorAsync(".oxd-alert-content-text");
-        var message = await alert.InnerTextAsync();
+        var message = await loginPage.GetAlertMessageWrongCredentialsAssync();
 
         Assert.That(message, Does.Contain("Invalid credentials"));
     }
