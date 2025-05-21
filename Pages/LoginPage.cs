@@ -30,12 +30,12 @@ public class LoginPage
         await _page.ClickAsync("a.oxd-userdropdown-link[href*='logout']");
     }
 
-    public async Task<string> GetAlertMessageRequiredAssync()
+    public async Task<string> GetRequiredFieldErrorAssync()
     {
         return await (await _page.WaitForSelectorAsync(".oxd-input-field-error-message")).InnerTextAsync();
     }
 
-    public async Task<string> GetAlertMessageWrongCredentialsAssync()
+    public async Task<string> GetInvalidCredentialsErrorAssync()
     {
         return await (await _page.WaitForSelectorAsync(".oxd-alert-content-text")).InnerTextAsync();
     }

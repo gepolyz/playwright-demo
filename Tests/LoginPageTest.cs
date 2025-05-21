@@ -10,12 +10,20 @@ namespace PlaywrightDemo.Tests;
 
 public class LoginPageTest : PageTest
 {
+    private LoginPage _loginPage;
+
+    [SetUp]
+    public async Task Init()
+    {
+        _loginPage = new LoginPage(Page);
+        await _loginPage.NavigateAsync(TestsConstants.BaseUrl);
+    }
+
+
     [Test]
     public async Task Login_ToSite_WithValidCredential()
     {
-        var loginPage = new LoginPage(Page);
-        await loginPage.NavigateAsync(TestsConstants.BaseUrl);
-        await loginPage.LoginAsync(TestsConstants.ValidUsername, TestsConstants.ValidPassword);
+        await _loginPage.LoginAsync(TestsConstants.ValidUsername, TestsConstants.ValidPassword);
 
         //Expect the URL contain "dashboard" 
         await Expect(Page).ToHaveURLAsync(new Regex("dashboard"));
@@ -24,23 +32,18 @@ public class LoginPageTest : PageTest
     [Test]
     public async Task Logout_FromDashBoard()
     {
-
-        var loginPage = new LoginPage(Page);
-        await loginPage.NavigateAsync(TestsConstants.BaseUrl);
-        await loginPage.LoginAsync(TestsConstants.ValidUsername, TestsConstants.ValidPassword);
-        await loginPage.LogoutAsync();
+        await _loginPage.LoginAsync(TestsConstants.ValidUsername, TestsConstants.ValidPassword);
+        await _loginPage.LogoutAsync();
         //Expect the URL contain "login", means returns to login page
         await Expect(Page).ToHaveURLAsync(new Regex("login"));
     }
 
     [Test]
-    public async Task Login_WihtBlank_Credentials()
+    public async Task Login_WihtBlankCredentials()
     {
-        var loginPage = new LoginPage(Page);
-        await loginPage.NavigateAsync(TestsConstants.BaseUrl);
-        await loginPage.LoginAsync("", "");
+        await _loginPage.LoginAsync("", "");
 
-        var message = await loginPage.GetAlertMessageRequiredAssync();
+        var message = await _loginPage.GetRequiredFieldErrorAssync();
         //Pops a "Required" message
         Assert.That(message, Does.Contain("Required"));
     }
@@ -50,11 +53,9 @@ public class LoginPageTest : PageTest
     [TestCase("Jane", "admin123")]
     public async Task Login_WithInvalidCredentials_ShouldFail(string username, string password)
     {
-        var loginPage = new LoginPage(Page);
-        await loginPage.NavigateAsync(TestsConstants.BaseUrl);
-        await loginPage.LoginAsync(username, password);
+        await _loginPage.LoginAsync(username, password);
 
-        var message = await loginPage.GetAlertMessageWrongCredentialsAssync();
+        var message = await _loginPage.GetInvalidCredentialsErrorAssync();
 
         Assert.That(message, Does.Contain("Invalid credentials"));
     }
